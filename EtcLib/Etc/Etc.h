@@ -26,6 +26,42 @@
 #define ETCCOMP_DEFAULT_EFFORT_LEVEL (40.0f)
 #define ETCCOMP_MAX_EFFORT_LEVEL (100.0f)
 
+extern "C" __declspec(dllexport) void Etc2FreeData(unsigned char* data);
+
+extern "C" __declspec(dllexport) void Etc2Encode(unsigned char*a_pafSourceRGBA,
+	unsigned int a_uiSourceWidth,
+	unsigned int a_uiSourceHeight,
+	Etc::Image::Format a_format,
+	unsigned char **a_ppaucEncodingBits,
+	unsigned int *a_puiEncodingBitsBytes,
+	unsigned int *a_puiExtendedWidth,
+	unsigned int *a_puiExtendedHeight,
+	int *a_piEncodingTime_ms);
+
+void Etc2Encode(float *a_pafSourceRGBA,
+	unsigned int a_uiSourceWidth,
+	unsigned int a_uiSourceHeight,
+	Etc::Image::Format a_format,
+	unsigned char **a_ppaucEncodingBits,
+	unsigned int *a_puiEncodingBitsBytes,
+	unsigned int *a_puiExtendedWidth,
+	unsigned int *a_puiExtendedHeight,
+	int *a_piEncodingTime_ms);
+
+void Etc2Encode(float *a_pafSourceRGBA,
+				unsigned int a_uiSourceWidth,
+				unsigned int a_uiSourceHeight,
+				Etc::Image::Format a_format,
+				Etc::ErrorMetric a_eErrMetric,
+				float a_fEffort,
+				unsigned int a_uiJobs,
+				unsigned int a_uimaxJobs,
+				unsigned char **a_ppaucEncodingBits,
+				unsigned int *a_puiEncodingBitsBytes,
+				unsigned int *a_puiExtendedWidth,
+				unsigned int *a_puiExtendedHeight,
+				int *a_piEncodingTime_ms, bool a_bVerboseOutput = false);
+
 namespace Etc
 {
 	class Block4x4EncodingBits;

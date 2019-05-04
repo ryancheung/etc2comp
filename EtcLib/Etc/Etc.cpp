@@ -20,6 +20,143 @@
 
 #include <string.h>
 
+void Etc2FreeData(unsigned char* data)
+{
+	delete[] data;
+}
+
+void Etc2Encode(unsigned char*a_pafSourceRGBA,
+	unsigned int a_uiSourceWidth,
+	unsigned int a_uiSourceHeight,
+	Etc::Image::Format a_format,
+	unsigned char **a_ppaucEncodingBits,
+	unsigned int *a_puiEncodingBitsBytes,
+	unsigned int *a_puiExtendedWidth,
+	unsigned int *a_puiExtendedHeight,
+	int *a_piEncodingTime_ms)
+{
+	Etc::ColorFloatRGBA *m_pafrgbaPixels;
+	m_pafrgbaPixels = new Etc::ColorFloatRGBA[a_uiSourceWidth * a_uiSourceHeight];
+
+	bool bool16BitImage = false;
+	int iBytesPerPixel = bool16BitImage ? 8 : 4;
+	unsigned char *pucPixel;
+	Etc::ColorFloatRGBA *pfrgbaPixel = m_pafrgbaPixels;
+
+	int iBlockX = 0;
+	int iBlockY = 0;
+	unsigned int iWidth = a_uiSourceWidth;
+	unsigned int iHeight = a_uiSourceHeight;
+	unsigned int m_uiWidth = iWidth;
+	unsigned int m_uiHeight = iHeight;
+
+	// convert pixels from RGBA* to ColorFloatRGBA
+	for (unsigned int uiV = iBlockY; uiV < (iBlockY + m_uiHeight); ++uiV)
+	{
+		// reset coordinate for each row
+		pucPixel = &a_pafSourceRGBA[(uiV * iWidth + iBlockX) * iBytesPerPixel];
+
+		// read each row
+		for (unsigned int uiH = iBlockX; uiH < (iBlockX + m_uiWidth); ++uiH)
+		{
+			if (bool16BitImage)
+			{
+				unsigned short ushR = (pucPixel[0] << 8) + pucPixel[1];
+				unsigned short ushG = (pucPixel[2] << 8) + pucPixel[3];
+				unsigned short ushB = (pucPixel[4] << 8) + pucPixel[5];
+				unsigned short ushA = (pucPixel[6] << 8) + pucPixel[7];
+
+				*pfrgbaPixel++ = Etc::ColorFloatRGBA((float)ushR / 65535.0f,
+					(float)ushG / 65535.0f,
+					(float)ushB / 65535.0f,
+					(float)ushA / 65535.0f);
+			}
+			else
+			{
+				*pfrgbaPixel++ = Etc::ColorFloatRGBA::ConvertFromRGBA8(pucPixel[0], pucPixel[1],
+					pucPixel[2], pucPixel[3]);
+			}
+
+			pucPixel += iBytesPerPixel;
+		}
+	}
+
+	Etc2Encode((float*)m_pafrgbaPixels,
+		a_uiSourceWidth,
+		a_uiSourceHeight,
+		a_format,
+		a_ppaucEncodingBits,
+		a_puiEncodingBitsBytes,
+		a_puiExtendedWidth,
+		a_puiExtendedHeight,
+		a_piEncodingTime_ms);
+
+	delete[] m_pafrgbaPixels;
+}
+
+void Etc2Encode(float *a_pafSourceRGBA,
+	unsigned int a_uiSourceWidth,
+	unsigned int a_uiSourceHeight,
+	Etc::Image::Format a_format,
+	unsigned char **a_ppaucEncodingBits,
+	unsigned int *a_puiEncodingBitsBytes,
+	unsigned int *a_puiExtendedWidth,
+	unsigned int *a_puiExtendedHeight,
+	int *a_piEncodingTime_ms)
+{
+	Etc::ErrorMetric a_eErrMetric = Etc::ErrorMetric::RGBA;
+	float a_fEffort = ETCCOMP_MIN_EFFORT_LEVEL;
+
+	unsigned int a_uiJobs = 20;
+	unsigned int a_uiMaxJobs = 1024;
+	bool a_bVerboseOutput = false;
+
+	Etc2Encode(a_pafSourceRGBA,
+		a_uiSourceWidth,
+		a_uiSourceHeight,
+		a_format,
+		a_eErrMetric,
+		a_fEffort,
+		a_uiJobs,
+		a_uiMaxJobs,
+		a_ppaucEncodingBits,
+		a_puiEncodingBitsBytes,
+		a_puiExtendedWidth,
+		a_puiExtendedHeight,
+		a_piEncodingTime_ms,
+		a_bVerboseOutput);
+}
+
+void Etc2Encode(float *a_pafSourceRGBA,
+	unsigned int a_uiSourceWidth,
+	unsigned int a_uiSourceHeight,
+	Etc::Image::Format a_format,
+	Etc::ErrorMetric a_eErrMetric,
+	float a_fEffort,
+	unsigned int a_uiJobs,
+	unsigned int a_uiMaxJobs,
+	unsigned char **a_ppaucEncodingBits,
+	unsigned int *a_puiEncodingBitsBytes,
+	unsigned int *a_puiExtendedWidth,
+	unsigned int *a_puiExtendedHeight,
+	int *a_piEncodingTime_ms, bool a_bVerboseOutput)
+{
+	Etc::Encode(a_pafSourceRGBA,
+		a_uiSourceWidth,
+		a_uiSourceHeight,
+		a_format,
+		a_eErrMetric,
+		a_fEffort,
+		a_uiJobs,
+		a_uiMaxJobs,
+		a_ppaucEncodingBits,
+		a_puiEncodingBitsBytes,
+		a_puiExtendedWidth,
+		a_puiExtendedHeight,
+		a_piEncodingTime_ms,
+		a_bVerboseOutput);
+}
+
 namespace Etc
 {
 	// ----------------------------------------------------------------------------------------------------
