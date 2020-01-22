@@ -30,3 +30,5 @@ CMakeFiles/
 CmakeCache.txt
 build_*/*
 !build_*/gen_xcode.sh
+build
+.vscode
